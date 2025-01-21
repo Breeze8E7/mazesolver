@@ -69,3 +69,39 @@ class Cell:
     def draw_move(self, to_cell, undo=False):
         color = "gray" if undo else "red"
         Line(self.center, to_cell.center).draw(self.win.canvas, color)
+
+class Maze:
+    def __init__(self, point, num_rows, num_cols, cell_size, win):
+        self.starting_point = point
+        self.rows = num_rows
+        self.columns = num_cols
+        self.cell_size = cell_size
+        self.win = win
+        self.cells = []
+        self.create_cells()
+
+    def create_cells(self):
+        top_level = []
+        for i in range(self.columns):
+            bottom_level = []
+            for j in range(self.rows):
+                x1 = self.starting_point.x + (i * self.cell_size)
+                y1 = self.starting_point.y + (j * self.cell_size)
+                x2 = x1 + self.cell_size
+                y2 = y1 + self.cell_size
+                point1 = Point(x1, y1)
+                point2 = Point(x2, y2)
+                bottom_level.append(Cell(point1, point2, self.win))
+            top_level.append(bottom_level)
+        self.cells = top_level
+        for i in range(self.columns):
+            for j in range(self.rows):
+                self.draw_cell(i, j)
+
+    def draw_cell(self, i, j):
+        self.cells[i][j].draw()
+        self.animate()
+    
+    def animate(self):
+        self.win.redraw()
+        time.sleep(0.05)
