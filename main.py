@@ -5,11 +5,9 @@ def main():
     #testing info below - no need to keep
     point1 = Point(50, 50)
     point2 = Point(200, 200)
-    line1 = Line(point1, point2)
-    win.draw_line(line1, "black")
-    point3 = Point(69, 420)
-    line2 = Line(point2, point3)
-    win.draw_line(line2, "red")
+    a_test_cell = Cell(point1, point2, win)
+    a_test_cell.has_bottom_wall = False
+    a_test_cell.draw()
     #testing info above - no need to keep
     win.wait_for_close()
 
