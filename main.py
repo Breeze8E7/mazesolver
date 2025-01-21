@@ -8,6 +8,12 @@ def main():
     a_test_cell = Cell(point1, point2, win)
     a_test_cell.has_bottom_wall = False
     a_test_cell.draw()
+    point3 = Point(350, 350)
+    point4 = Point(500, 500)
+    b_test_cell = Cell(point3, point4, win)
+    b_test_cell.has_top_wall = False
+    b_test_cell.draw()
+    b_test_cell.draw_move(a_test_cell, True)
     #testing info above - no need to keep
     win.wait_for_close()
 

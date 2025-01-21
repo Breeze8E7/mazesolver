@@ -53,6 +53,7 @@ class Cell:
         self.br_corner = b_point
         self.tr_corner = Point(b_point.x, a_point.y)
         self.bl_corner = Point(a_point.x, b_point.y)
+        self.center = Point(((a_point.x + b_point.x) // 2), ((a_point.y + b_point.y) // 2))
         self.win = window
 
     def draw(self):
@@ -64,3 +65,7 @@ class Cell:
             Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "black")
         if self.has_right_wall == True:
             Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "black")
+
+    def draw_move(self, to_cell, undo=False):
+        color = "gray" if undo else "red"
+        Line(self.center, to_cell.center).draw(self.win.canvas, color)
