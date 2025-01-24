@@ -15,13 +15,5 @@ class Tests(unittest.TestCase):
             num_cols,          # Should match the number of columns.
         )
 
-
-
-
-
-
-
-
-
 if __name__ == "__main__":
     unittest.main()

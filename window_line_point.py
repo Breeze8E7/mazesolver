@@ -98,7 +98,6 @@ class Maze:
             random.seed(seed)
 
     def create_cells(self):
-        print(f"Maze dimensions: {self.rows} rows, {self.columns} columns")
         top_level = []
         for i in range(self.rows):
             bottom_level = []
@@ -114,11 +113,12 @@ class Maze:
         self.cells = top_level
         self.break_entrance_and_exit()
         self.break_walls_recursive(0, 0)
+        self.reset_cells_visited()
+        self.print_visited_status() #testing only
         for i in range(self.rows):
             for j in range(self.columns):
                 self.draw_cell(i, j)
         
-
     def draw_cell(self, i, j):
         if self.win is not None:
             self.cells[i][j].draw()
@@ -151,25 +151,30 @@ class Maze:
                 if self.cells[i-1][j].visited == False:
                     neighbors.append([i-1, j])
             if not neighbors:
-                print(f"No available neighbors at cell ({i}, {j})")
                 return
-            print(f"At cell ({i}, {j}), possible neighbors: {neighbors}")
             next_cell = random.choice(neighbors)
             if next_cell[0] == i and next_cell[1] == j-1:  # Moving LEFT
-               print(f"Breaking walls between ({i}, {j}) and {next_cell}")
                current.has_left_wall = False
                self.cells[i][j-1].has_right_wall = False
             elif next_cell[0] == i and next_cell[1] == j+1:  # Moving RIGHT
-                print(f"Breaking walls between ({i}, {j}) and {next_cell}")
                 current.has_right_wall = False
                 self.cells[i][j+1].has_left_wall = False
             elif next_cell[0] == i+1 and next_cell[1] == j:  # Moving DOWN
-                print(f"Breaking walls between ({i}, {j}) and {next_cell}")
                 current.has_bottom_wall = False
                 self.cells[i+1][j].has_top_wall = False
             elif next_cell[0] == i-1 and next_cell[1] == j:  # Moving UP
-                print(f"Breaking walls between ({i}, {j}) and {next_cell}")
                 current.has_top_wall = False
                 self.cells[i-1][j].has_bottom_wall = False
-            print(f"Breaking walls at ({i}, {j})")
             self.break_walls_recursive(next_cell[0], next_cell[1])
+
+    def reset_cells_visited(self):
+        for cells in self.cells:
+            for cell in cells:
+                cell.visited = False
+
+    #testing only
+    def print_visited_status(self):
+        for row in self.cells:
+            for cell in row:
+                print(cell.visited, end=" ")
+            print()  # Move to the next row
