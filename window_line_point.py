@@ -60,12 +60,23 @@ class Cell:
         if self.win is not None:
             if self.has_bottom_wall == True:
                 Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "black")
+            else:
+                Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "lime")
+
             if self.has_top_wall == True:
                 Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "black")
+            else:
+                Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "lime")
+
             if self.has_left_wall == True:
                 Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "black")
+            else:
+                Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "lime")
+
             if self.has_right_wall == True:
                 Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "black")
+            else:
+                Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "lime")
 
     def draw_move(self, to_cell, undo=False):
         if self.win is not None:
@@ -96,10 +107,11 @@ class Maze:
                 bottom_level.append(Cell(point1, point2, self.win))
             top_level.append(bottom_level)
         self.cells = top_level
+        self.break_entrance_and_exit()
         for i in range(self.columns):
             for j in range(self.rows):
                 self.draw_cell(i, j)
-        self.break_entrance_and_exit()
+        
 
     def draw_cell(self, i, j):
         if self.win is not None:
