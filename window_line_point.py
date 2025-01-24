@@ -63,26 +63,26 @@ class Cell:
             if self.has_bottom_wall == True:
                 Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "black")
             else:
-                Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "lime")
+                Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "#d9d9d9")
 
             if self.has_top_wall == True:
                 Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "black")
             else:
-                Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "lime")
+                Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "#d9d9d9")
 
             if self.has_left_wall == True:
                 Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "black")
             else:
-                Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "lime")
+                Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "#d9d9d9")
 
             if self.has_right_wall == True:
                 Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "black")
             else:
-                Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "lime")
+                Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "#d9d9d9")
 
     def draw_move(self, to_cell, undo=False):
         if self.win is not None:
-            color = "gray" if undo else "red"
+            color = "#d9d9d9" if undo else "red"
             Line(self.center, to_cell.center).draw(self.win.canvas, color)
 
 class Maze:
@@ -114,7 +114,6 @@ class Maze:
         self.break_entrance_and_exit()
         self.break_walls_recursive(0, 0)
         self.reset_cells_visited()
-        self.print_visited_status() #testing only
         for i in range(self.rows):
             for j in range(self.columns):
                 self.draw_cell(i, j)
@@ -127,7 +126,7 @@ class Maze:
     def animate(self):
         if self.win is not None:
             self.win.redraw()
-            time.sleep(0.05)
+            time.sleep(0.01)
 
     def break_entrance_and_exit(self):
         self.cells[0][0].has_top_wall = False
@@ -178,3 +177,47 @@ class Maze:
             for cell in row:
                 print(cell.visited, end=" ")
             print()  # Move to the next row
+
+    def solve(self):
+        return self.solve_recursive(0,0)
+    
+    def solve_recursive(self, i, j):
+        current_cell = self.cells[i][j]
+        goal_cell = self.cells[self.rows - 1][self.columns - 1]
+        self.animate()
+        current_cell.visited = True
+        if current_cell == goal_cell:
+            return True
+        if current_cell.has_left_wall == False:    
+            if j-1 >= 0:
+                if self.cells[i][j-1].visited == False:
+                    current_cell.draw_move(self.cells[i][j-1])
+                    if self.solve_recursive(i,j-1):
+                        return True
+                    else:
+                        current_cell.draw_move(self.cells[i][j-1], undo=True)
+        if current_cell.has_right_wall == False:            
+            if j+1 < self.columns:
+                if self.cells[i][j+1].visited == False:
+                    current_cell.draw_move(self.cells[i][j+1])
+                    if self.solve_recursive(i,j+1):
+                        return True
+                    else:
+                        current_cell.draw_move(self.cells[i][j+1], undo=True)
+        if current_cell.has_bottom_wall == False:    
+            if i+1 < self.rows:
+                if self.cells[i+1][j].visited == False:
+                    current_cell.draw_move(self.cells[i+1][j])
+                    if self.solve_recursive(i+1,j):
+                        return True
+                    else:
+                        current_cell.draw_move(self.cells[i+1][j], undo=True)
+        if current_cell.has_top_wall == False:    
+            if i-1 >= 0:
+                if self.cells[i-1][j].visited == False:
+                    current_cell.draw_move(self.cells[i-1][j])
+                    if self.solve_recursive(i-1,j):
+                        return True
+                    else:
+                        current_cell.draw_move(self.cells[i-1][j], undo=True)
+        return False
