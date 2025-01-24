@@ -3,13 +3,21 @@ import time
 import random
 
 class Window:
-    def __init__(self, width, height):
+    def __init__(self, width, height, bg="black"):
         self.root = Tk()
         self.root.title("Maze Solver")
         self.running = False
-        self.canvas = Canvas(self.root, width=width, height=height)
+        self.canvas = Canvas(self.root, width=width, height=height, bg=bg)
         self.canvas.pack()
         self.root.protocol("WM_DELETE_WINDOW", self.close)
+        self.maze = None
+
+    def set_maze(self, maze):
+        self.maze = maze
+
+    def handle_keypress(self, event):
+        if self.maze:
+            self.maze.solve()
 
     def redraw(self):
         self.root.update_idletasks()
@@ -61,28 +69,28 @@ class Cell:
     def draw(self):
         if self.win is not None:
             if self.has_bottom_wall == True:
-                Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "black")
+                Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "white")
             else:
-                Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "#d9d9d9")
+                Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "black")
 
             if self.has_top_wall == True:
-                Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "black")
+                Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "white")
             else:
-                Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "#d9d9d9")
+                Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "black")
 
             if self.has_left_wall == True:
-                Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "black")
+                Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "white")
             else:
-                Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "#d9d9d9")
+                Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "black")
 
             if self.has_right_wall == True:
-                Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "black")
+                Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "white")
             else:
-                Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "#d9d9d9")
+                Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "black")
 
     def draw_move(self, to_cell, undo=False):
         if self.win is not None:
-            color = "#d9d9d9" if undo else "red"
+            color = "black" if undo else "purple"
             Line(self.center, to_cell.center).draw(self.win.canvas, color)
 
 class Maze:
