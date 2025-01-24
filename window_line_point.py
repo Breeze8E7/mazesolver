@@ -1,5 +1,6 @@
 from tkinter import Tk, BOTH, Canvas
 import time
+import random
 
 class Window:
     def __init__(self, width, height):
@@ -55,6 +56,7 @@ class Cell:
         self.bl_corner = Point(a_point.x, b_point.y)
         self.center = Point(((a_point.x + b_point.x) // 2), ((a_point.y + b_point.y) // 2))
         self.win = window
+        self.visited = False
 
     def draw(self):
         if self.win is not None:
@@ -84,7 +86,7 @@ class Cell:
             Line(self.center, to_cell.center).draw(self.win.canvas, color)
 
 class Maze:
-    def __init__(self, point, num_rows, num_cols, cell_size, win=None):
+    def __init__(self, point, num_rows, num_cols, cell_size, win=None, seed=None):
         self.starting_point = point
         self.rows = num_rows
         self.columns = num_cols
@@ -92,14 +94,17 @@ class Maze:
         self.win = win
         self.cells = []
         self.create_cells()
+        if seed != None:
+            random.seed(seed)
 
     def create_cells(self):
+        print(f"Maze dimensions: {self.rows} rows, {self.columns} columns")
         top_level = []
-        for i in range(self.columns):
+        for i in range(self.rows):
             bottom_level = []
-            for j in range(self.rows):
-                x1 = self.starting_point.x + (i * self.cell_size)
-                y1 = self.starting_point.y + (j * self.cell_size)
+            for j in range(self.columns):
+                x1 = self.starting_point.x + (j * self.cell_size)
+                y1 = self.starting_point.y + (i * self.cell_size)
                 x2 = x1 + self.cell_size
                 y2 = y1 + self.cell_size
                 point1 = Point(x1, y1)
@@ -108,8 +113,9 @@ class Maze:
             top_level.append(bottom_level)
         self.cells = top_level
         self.break_entrance_and_exit()
-        for i in range(self.columns):
-            for j in range(self.rows):
+        self.break_walls_recursive(0, 0)
+        for i in range(self.rows):
+            for j in range(self.columns):
                 self.draw_cell(i, j)
         
 
@@ -125,4 +131,45 @@ class Maze:
 
     def break_entrance_and_exit(self):
         self.cells[0][0].has_top_wall = False
-        self.cells[self.columns - 1][self.rows - 1].has_bottom_wall = False
+        self.cells[self.rows - 1][self.columns - 1].has_bottom_wall = False
+
+    def break_walls_recursive(self, i, j):
+        current = self.cells[i][j]
+        current.visited = True
+        while True:
+            neighbors = []
+            if j-1 >= 0:
+                if self.cells[i][j-1].visited == False:
+                    neighbors.append([i, j-1])
+            if j+1 < self.columns:
+                if self.cells[i][j+1].visited == False:
+                    neighbors.append([i, j+1])
+            if i+1 < self.rows:
+                if self.cells[i+1][j].visited == False:
+                    neighbors.append([i+1, j])
+            if i-1 >= 0:
+                if self.cells[i-1][j].visited == False:
+                    neighbors.append([i-1, j])
+            if not neighbors:
+                print(f"No available neighbors at cell ({i}, {j})")
+                return
+            print(f"At cell ({i}, {j}), possible neighbors: {neighbors}")
+            next_cell = random.choice(neighbors)
+            if next_cell[0] == i and next_cell[1] == j-1:  # Moving LEFT
+               print(f"Breaking walls between ({i}, {j}) and {next_cell}")
+               current.has_left_wall = False
+               self.cells[i][j-1].has_right_wall = False
+            elif next_cell[0] == i and next_cell[1] == j+1:  # Moving RIGHT
+                print(f"Breaking walls between ({i}, {j}) and {next_cell}")
+                current.has_right_wall = False
+                self.cells[i][j+1].has_left_wall = False
+            elif next_cell[0] == i+1 and next_cell[1] == j:  # Moving DOWN
+                print(f"Breaking walls between ({i}, {j}) and {next_cell}")
+                current.has_bottom_wall = False
+                self.cells[i+1][j].has_top_wall = False
+            elif next_cell[0] == i-1 and next_cell[1] == j:  # Moving UP
+                print(f"Breaking walls between ({i}, {j}) and {next_cell}")
+                current.has_top_wall = False
+                self.cells[i-1][j].has_bottom_wall = False
+            print(f"Breaking walls at ({i}, {j})")
+            self.break_walls_recursive(next_cell[0], next_cell[1])
