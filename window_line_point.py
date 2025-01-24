@@ -40,7 +40,7 @@ class Line:
         canvas.create_line(self.a.x, self.a.y, self.b.x, self.b.y, fill=fill_color, width=2)
          
 class Cell:
-    def __init__(self, a_point, b_point, window):
+    def __init__(self, a_point, b_point, window=None):
         self.has_left_wall = True
         self.has_right_wall = True
         self.has_top_wall = True
@@ -57,21 +57,23 @@ class Cell:
         self.win = window
 
     def draw(self):
-        if self.has_bottom_wall == True:
-            Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "black")
-        if self.has_top_wall == True:
-            Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "black")
-        if self.has_left_wall == True:
-            Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "black")
-        if self.has_right_wall == True:
-            Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "black")
+        if self.win is not None:
+            if self.has_bottom_wall == True:
+                Line(self.bl_corner, self.br_corner).draw(self.win.canvas, "black")
+            if self.has_top_wall == True:
+                Line(self.tl_corner, self.tr_corner).draw(self.win.canvas, "black")
+            if self.has_left_wall == True:
+                Line(self.bl_corner, self.tl_corner).draw(self.win.canvas, "black")
+            if self.has_right_wall == True:
+                Line(self.br_corner, self.tr_corner).draw(self.win.canvas, "black")
 
     def draw_move(self, to_cell, undo=False):
-        color = "gray" if undo else "red"
-        Line(self.center, to_cell.center).draw(self.win.canvas, color)
+        if self.win is not None:
+            color = "gray" if undo else "red"
+            Line(self.center, to_cell.center).draw(self.win.canvas, color)
 
 class Maze:
-    def __init__(self, point, num_rows, num_cols, cell_size, win):
+    def __init__(self, point, num_rows, num_cols, cell_size, win=None):
         self.starting_point = point
         self.rows = num_rows
         self.columns = num_cols
@@ -97,11 +99,18 @@ class Maze:
         for i in range(self.columns):
             for j in range(self.rows):
                 self.draw_cell(i, j)
+        self.break_entrance_and_exit()
 
     def draw_cell(self, i, j):
-        self.cells[i][j].draw()
-        self.animate()
+        if self.win is not None:
+            self.cells[i][j].draw()
+            self.animate()
     
     def animate(self):
-        self.win.redraw()
-        time.sleep(0.05)
+        if self.win is not None:
+            self.win.redraw()
+            time.sleep(0.05)
+
+    def break_entrance_and_exit(self):
+        self.cells[0][0].has_top_wall = False
+        self.cells[self.columns - 1][self.rows - 1].has_bottom_wall = False
